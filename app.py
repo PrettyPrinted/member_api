@@ -71,7 +71,11 @@ def edit_member(member_id):
 
 @app.route('/member/<int:member_id>', methods=['DELETE'])
 def delete_member(member_id):
-    return 'This removes a member by ID.'
+    db = get_db()
+    db.execute('delete from members where id = ?', [member_id])
+    db.commit()
+
+    return jsonify({'message' : 'The member has been deleted!'})
 
 if __name__ == '__main__':
     app.run(debug=True)
