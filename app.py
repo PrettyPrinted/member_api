@@ -1,4 +1,4 @@
-from flask import Flask, g, request
+from flask import Flask, g, request, jsonify
 from database import get_db
 
 app = Flask(__name__)
@@ -28,7 +28,10 @@ def add_member():
     db.execute('insert into members (name, email, level) values (?, ?, ?)', [name, email, level])
     db.commit()
 
-    return 'The name is {}, the email is {}, and the level is {}'.format(name, email, level)
+    member_cur = db.execute('select id, name, email, level from members where name = ?', [name])
+    new_member = member_cur.fetchone()
+
+    return jsonify({'id' : new_member['id'], 'name' : new_member['name'], 'email' : new_member['email'], 'level' : new_member['level']})
 
 @app.route('/member/<int:member_id>', methods=['PUT', 'PATCH'])
 def edit_member(member_id):
