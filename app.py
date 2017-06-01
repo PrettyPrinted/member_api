@@ -1,4 +1,4 @@
-from flask import Flask, g
+from flask import Flask, g, request
 from database import get_db
 
 app = Flask(__name__)
@@ -18,7 +18,17 @@ def get_member(member_id):
 
 @app.route('/member', methods=['POST'])
 def add_member():
-    return 'This adds a new member.'
+    new_member_data = request.get_json()
+
+    name = new_member_data['name']
+    email = new_member_data['email']
+    level = new_member_data['level']
+
+    db = get_db()
+    db.execute('insert into members (name, email, level) values (?, ?, ?)', [name, email, level])
+    db.commit()
+
+    return 'The name is {}, the email is {}, and the level is {}'.format(name, email, level)
 
 @app.route('/member/<int:member_id>', methods=['PUT', 'PATCH'])
 def edit_member(member_id):
